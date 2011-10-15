@@ -1,7 +1,7 @@
 CModel
 ======
 
-<p style="background-color: #FFC; padding: 15px; margin: 20px; border: 1px solid #CC0;"><strong>ALERT</strong>: I haven't uploaded anything useful yet! Will do soon though :)</p>
+    **ALERT**: I haven't uploaded anything useful yet! Will do soon though :)
 
 CModel is a model template for Zend Framework. Included are:
 
