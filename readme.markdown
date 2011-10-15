@@ -1,7 +1,7 @@
 CModel
 ======
 
-    **ALERT**: I haven't uploaded anything useful yet! Will do soon though :)
+    **ALERT**  I haven't uploaded anything useful yet! Will do soon though :)
 
 CModel is a model template for Zend Framework. Included are:
 
