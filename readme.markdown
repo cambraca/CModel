@@ -21,7 +21,7 @@ Requirements
 History
 -------
 
-[Pricetag](http://pricetaghq.com) is a project created by a small team of talented people. I was in charge of programming, and at first I had complete control over how things would work internally. So, after deciding to use Zend Framework as a starting point, the next logical step was building the model. I quickly realized Zend Framework doesn't provide any classes for the Model part of the MVC architecture (albeit its excellent support for the other 2 thirds of the equation), so I had to build my own from scratch. I found some advice on the internet, and this thing started to evolve on its own from some basic concepts like lazy loading of related objects.
+[Pricetag](http://pricetaghq.com) is a project created by a small team of talented people. I was in charge of programming, and at first I had complete control over how things would work internally. So, after deciding to use Zend Framework as a starting point, the next logical step was building the model. I quickly realized Zend Framework doesn't provide any classes for the Model part of the MVC architecture (despite its excellent support for the other 2 thirds of the equation), so I had to build my own from scratch. I found some advice on the internet, and this thing started to evolve on its own from some basic concepts like lazy loading of related objects.
 
 Some months later, Pricetag is pretty much stable (I, of course, attribute it to the project's excellent foundations, that is, the model), so I wanted to share what I did with the world.
 
