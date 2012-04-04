@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>CModel by cambraca</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>CModel</h1>
+<p>A model library for Zend Framework</p>
+        <p class="view"><a href="https://github.com/cambraca/CModel">View the Project on GitHub <small>cambraca/CModel</small></a></p>
+        <ul>
+          <li><a href="https://github.com/cambraca/CModel/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/cambraca/CModel/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/cambraca/CModel">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <pre><code>**ALERT**  I haven't uploaded anything useful yet! Will do soon though :)
+</code></pre>
+
+<p>CModel is a model template for Zend Framework. Included are:</p>
+
+<ul>
+<li>The CModel library (inside the <code>/library/CModel</code> directory)</li>
+<li>A sample project</li>
+<li>A script for creating the MySQL database used in the sample project (<code>/data/cmodel.sql</code>)</li>
+<li>Utility functions for creating your model from existing tables</li>
+</ul><h2>Requirements</h2>
+
+<ul>
+<li>PHP 5.3+ (this may work in lower versions, but I'm too lazy to test)</li>
+<li>MySQL</li>
+<li>Apache</li>
+<li>Zend Framework 1.10.3+ (again, I'm sure you can use older versions, but this is the one I used to create the sample project, and I'm lazy)</li>
+</ul><h2>History</h2>
+
+<p><a href="http://pricetaghq.com">Pricetag</a> is a project created by a small team of talented people. I was in charge of programming, and at first I had complete control over how things would work internally. So, after deciding to use Zend Framework as a starting point, the next logical step was building the model. I quickly realized Zend Framework doesn't provide any classes for the Model part of the MVC architecture (despite its excellent support for the other 2 thirds of the equation), so I had to build my own from scratch. I found some advice on the internet, and this thing started to evolve on its own from some basic concepts like lazy loading of related objects.</p>
+
+<p>Some months later, Pricetag is pretty much stable (I, of course, attribute it to the project's excellent foundations, that is, the model), so I wanted to share what I did with the world.</p>
+
+<p>It should be noted that Pricetag was the first time I'd ever worked with this framework, and its documentation has been a bit unhelpful, so I tried to learn the best I could, trial and error, and a lot of time spent looking at its source code. It's been fun, but I'm sure there could be things here that can be done in a much better way.</p>
+
+<p>So, what I'm doing is copying Pricetag's model's base classes and dev tools (a couple of actions in a controller that only gets used in a development environment), and trying to put as much as I can in a separate library. Pricetag's code has everything in one place, but the idea is eventually to use these files as a separate library.</p>
+
+<h2>Use</h2>
+
+<p>(instructions on how to use the sample project, and how to import the library to an existing project or create one from scratch)</p>
+
+<h2>To-do</h2>
+
+<ul>
+<li>Build a simple but useful sample application to show off the model</li>
+<li>Write unit tests for everything</li>
+<li>Add a version number to this thing!</li>
+</ul>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/cambraca">cambraca</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
