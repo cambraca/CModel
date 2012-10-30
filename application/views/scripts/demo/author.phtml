@@ -1,0 +1,19 @@
+<h1>CModel sample project</h1>
+
+<h2>Author: <a href="mailto:<?= $this->author->email ?>"><?= $this->author->name ?></a></h2>
+
+<a href="/demo">Go back</a>
+
+<section>
+	<header>
+		<h3>Posts</h3>
+	</header>
+	<?php foreach ($this->author->posts as $post): ?>
+	<article>
+		<header>
+			<h4><?= $post->title ?></h4>
+		</header>
+		<?= nl2br($post->content) ?>
+	</article>
+	<?php endforeach; ?>
+</section>

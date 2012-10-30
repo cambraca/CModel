@@ -1,0 +1,279 @@
+<div class="top-bar span-24 last">
+	<ul class="links">
+		<li><a href="/dev">Dev Tools!</a></li>
+	</ul>
+</div>
+
+<?php
+	/**
+	 * @param int $longest the length of the longest string
+	 * @param string $string the string
+	 * @param int $extra_chars how many extra characters (like quotes)
+	 * @return string at least one tab character
+	 * @package Dev
+	 */
+	function tabs($longest, $string, $extra_chars = 0)
+	{
+		$goal = ceil(($longest + $extra_chars + 1) / 4);
+		$tab_chars = 4;
+		$len = strlen($string) + $extra_chars;
+		
+		$ret = 1; //# of tab characters
+		while ((($len + $tab_chars * $ret) / 4) < $goal)
+			$ret++;
+		
+//echo "l $longest s $string e $extra_chars r $ret \n";
+		return str_repeat("\t", $ret);
+	}
+?>
+<h2>Code Generator</h2>
+
+<div class="span-24 last">
+
+	<h3>Domain Model Class</h3>
+
+	<pre style="letter-spacing: 0; overflow: auto">
+<?php ob_start(); ?>
+&lt;?php
+
+	/**
+	 * <?= $this->tableCamelCase ?> class.
+	 * @package FoodOrder
+	 * @subpackage Model
+	 * @author Camilo Bravo &lt;cambraca@gmail.com&gt;
+	 *
+<?php
+	foreach ($this->describe as $field):
+?>	 * @property <?php 
+	if (isset($this->fks[$field['Field']]))
+	{
+		$fk = $this->fks[$field['Field']];
+		echo $fk['tableCamelCase'];
+	} elseif (substr($field['Type'], 0, 3) == 'int')
+		echo 'int';
+	elseif (substr($field['Type'], 0, 8) == 'smallint')
+		echo 'int';
+	elseif ($field['Type'] == 'tinyint(1) unsigned')
+		echo 'bool';
+	elseif (substr($field['Type'], 0, 7) == 'tinyint')
+		echo 'int';
+	elseif (substr($field['Type'], 0, 7) == 'decimal')
+		echo 'currency';
+	elseif (substr($field['Type'], 0, 5) == 'float')
+		echo 'float';
+	elseif (substr($field['Type'], 0, 7) == 'varchar')
+		echo 'string';
+	elseif (substr($field['Type'], 0, 4) == 'text')
+		echo 'string';
+	elseif (substr($field['Type'], 0, 4) == 'char')
+		echo 'string';
+	elseif (substr($field['Type'], 0, 4) == 'enum')
+		echo 'string';
+	elseif (substr($field['Type'], 0, 9) == 'timestamp')
+		echo 'timestamp';
+	elseif (substr($field['Type'], 0, 4) == 'time')
+		echo 'time';
+	elseif (substr($field['Type'], 0, 4) == 'date')
+		echo 'date';
+	else
+		echo '?';
+	?> $<?= $temp = isset($this->fks[$field['Field']]) ? $this->fks[$field['Field']]['table'] : $field['Field'] ?>;
+<?php
+	endforeach;
+?>
+	 */
+	class <?= $this->tableCamelCase ?> extends CModel_Entity
+	{
+<?php
+foreach ($this->enums as $field => $enum):
+	$longest = 0;
+	foreach ($enum as $value => $const)
+		$longest = max($longest, strlen($const));
+	foreach ($enum as $value => $const):
+?>		const <?= $const.tabs($longest, $const, 6) ?>= '<?= $value ?>';
+<?php 
+	endforeach;
+	echo PHP_EOL;
+endforeach;
+?>
+		protected $_data = array(
+<?php 
+	$longest = 0;
+	foreach ($this->describe as $field)
+		$longest = max($longest, strlen(isset($this->fks[$field['Field']]) ? $this->fks[$field['Field']]['table'] : $field['Field']));
+	foreach ($this->describe as $field):
+?>			'<?= $temp = isset($this->fks[$field['Field']]) ? $this->fks[$field['Field']]['table'] : $field['Field'] ?>'<?= tabs($longest, $temp, 2) ?>=> <?= $field['Field'] == 'id' || isset($this->fks[$field['Field']]) ? 'NULL' : ($field['Type'] == 'tinyint(3) unsigned' ? ($field['Default'] == 1 ? 'TRUE' : 'FALSE') : '\'\'') ?>,
+<?php
+	endforeach;
+?>
+		);
+
+		protected $_readonly = array(
+		);
+		
+		protected $_required = array(
+		);
+		
+		protected static $_filters = array(
+		);
+		
+		protected static $_validators = array(
+<?php
+foreach ($this->enums as $field => $enum):
+?>
+			'<?= $field ?>' => array(
+				array('InArray', FALSE, array(
+					'haystack'	=> array(
+<?php
+//	$longest = 0;
+//	foreach ($enum as $value => $const)
+//		$longest = max($longest, strlen($const));
+	foreach ($enum as $value => $const):
+?>						self::<?= $const ?>,
+<?php 
+	endforeach;
+?>
+					),
+					'messages'	=> array(
+						Zend_Validate_InArray::NOT_IN_ARRAY => 'Invalid <?= $field ?>',
+					),
+				)),
+			),
+<?php	
+//	echo PHP_EOL;
+endforeach;
+?>
+		);
+
+<?php if ($this->fks): ?>
+		public function __set($name, $value)
+		{
+			switch ($name)
+			{
+<?php foreach ($this->fks as $field => $fk): ?>
+				case '<?= $fk['table'] ?>':
+					if (!$value instanceof <?= $fk['tableCamelCase'] ?><?php if ($fk['Null'] == 'YES') echo ' && $value !== NULL'; ?>)
+						throw new Exception();
+					break;
+<?php endforeach; ?>
+				default:
+			}
+
+			parent::__set($name, $value);
+		}
+
+		public function __get($name)
+		{
+			switch ($name)
+			{
+<?php foreach ($this->fks as $field => $fk): ?>
+				case '<?= $fk['table'] ?>':
+					if ($this->getReferenceId($name) && !$this->_data[$name] instanceof <?= $fk['tableCamelCase'] ?>)
+						$this->_data[$name] = <?= $fk['tableCamelCase'] ?>Mapper::singleton()->find($this->getReferenceId($name));
+					break;
+<?php endforeach; ?>
+				default:
+			}
+			return parent::__get($name);
+		}
+<?php endif; ?>
+	}
+<?php
+	$data = ob_get_flush();
+	if (!file_exists($filename = APPLICATION_PATH.'/models/'.$this->tableCamelCase.'.php'))
+		file_put_contents($filename, html_entity_decode($data));
+?>
+	</pre>
+
+	<h3>Mapper Class</h3>
+
+	<pre style="letter-spacing: 0; overflow: auto">
+<?php ob_start(); ?>
+&lt;?php
+
+	/**
+	 * <?= $this->tableCamelCase ?> Mapper class.
+	 * @package FoodOrder
+	 * @subpackage Mappers
+	 * @author Camilo Bravo &lt;cambraca@gmail.com&gt;
+	 */
+	class <?= $this->tableCamelCase ?>Mapper extends CModel_Mapper
+	{
+		protected $_tableName = '<?= $this->table ?>';
+		protected $_entityClass = '<?= $this->tableCamelCase ?>';
+
+		public function save(<?= $this->tableCamelCase ?> $<?= $this->table ?>)
+		{
+			if (!$<?= $this->table ?>->id || $<?= $this->table ?>->hasChanged())
+			{
+				$<?= $this->table ?>->validateRequiredProperties();
+				$<?= $this->table ?>->saving();
+				$data = array(
+<?php
+	$longest = 0;
+	foreach ($this->describe as $field)
+	{
+		if ($field['Field'] == 'id') continue; //no id field in this list
+		$longest = max($longest, strlen($field['Field']));
+	}
+	foreach ($this->describe as $field): if ($field['Field'] == 'id') continue; //no id field in this list
+?>					'<?= $field['Field'] ?>'<?= tabs($longest, $field['Field'], 2) ?>=> $<?= $this->table ?>-><?= isset($this->fks[$field['Field']]) ? ($field['Null'] == 'YES' ? $this->fks[$field['Field']]['table'].' ? $'.$this->table.'->'.$this->fks[$field['Field']]['table'].'->id : NULL' : $this->fks[$field['Field']]['table'].'->id') : $field['Field'] ?><?= ($field['Type'] == 'tinyint(1) unsigned' ? ' ? 1 : 0' : '') ?>,
+<?php
+	endforeach;
+?>
+				);
+				if (!$<?= $this->table ?>->id) {
+					$<?= $this->table ?>->id = $this->_getGateway()->insert($data);
+					$this->_setIdentity($<?= $this->table ?>->id, $<?= $this->table ?>);
+				} else {
+					$where = $this->_getGateway()->getAdapter()
+						->quoteInto('id = ?', $<?= $this->table ?>->id);
+					$this->_getGateway()->update($data, $where);
+				}
+				$<?= $this->table ?>->saved();
+			}
+		}
+
+		public function find($id)
+		{
+			if (is_object($id))
+			{
+				$result = $id;
+				$id = $result->id;
+			}
+			if ($this->_getIdentity($id)) {
+				return $this->_getIdentity($id);
+			}
+			if (!isset($result))
+				$result = $this->_getGateway()->find($id)->current();
+			$<?= $this->table ?> = new $this->_entityClass(array(
+<?php
+	$longest = 0;
+	foreach ($this->describe as $field)
+	{
+		if (isset($this->fks[$field['Field']])) continue; //no FK fields in this list
+		$longest = max($longest, strlen($field['Field']));
+	}
+	foreach ($this->describe as $field): if (isset($this->fks[$field['Field']])) continue; //no FK fields in this list
+?>				'<?= $field['Field'] ?>'<?= tabs($longest, $field['Field'], 2) ?>=> <?= ($field['Type'] == 'tinyint(1) unsigned' ? '(bool) ' : '') ?>$result-><?= $field['Field'] ?>,
+<?php
+	endforeach;
+?>
+			));
+<?php foreach ($this->fks as $field => $fk): ?>
+			$<?= $this->table ?>->setReferenceId('<?= $fk['table'] ?>', $result-><?= $field ?>);
+<?php endforeach; ?>
+
+			$this->_setIdentity($id, $<?= $this->table ?>);
+			return $<?= $this->table ?>;
+		}
+
+	}
+<?php
+	$data = ob_get_flush();
+	if (!file_exists($filename = APPLICATION_PATH.'/models/'.$this->tableCamelCase.'Mapper.php'))
+		file_put_contents($filename, html_entity_decode($data));
+?>
+	</pre>
+
+</div>

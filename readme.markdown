@@ -1,7 +1,7 @@
-CModel
-======
+CModel 1.0
+==========
 
-    **ALERT**  I haven't uploaded anything useful yet! Will do soon though :)
+    **ALERT**  Although this is usable, the demo and documentation are very rough! Hopefully this will improve soon :)
 
 CModel is a model template for Zend Framework. Included are:
 
@@ -39,4 +39,3 @@ To-do
 
 * Build a simple but useful sample application to show off the model
 * Write unit tests for everything
-* Add a version number to this thing!

@@ -2,6 +2,9 @@
 
 	/**
 	 * Main Entity class.
+	 * 
+	 * @version 1.0
+	 * @package CModel
 	 * @author Camilo Bravo <cambraca@gmail.com>
 	 */
 	abstract class CModel_Entity
@@ -121,9 +124,13 @@
 			$this->_version = static::VERSION;
 			if (!is_null($data)) {
 				$this->collectValidationErrors();
-				foreach ($data as $name => $value) {
-					$this->{$name} = $value;
+				foreach ($this->_data as $k => $v) {
+					if (array_key_exists($k, $data))
+						$this->{$k} = $data[$k];
 				}
+//				foreach ($data as $name => $value) {
+//					$this->{$name} = $value;
+//				}
 				$this->checkValidation();
 			}
 			$this->_creating = FALSE;
@@ -147,7 +154,7 @@
 		public function collectValidationErrors()
 		{
 			if ($this->_collect_validation_errors)
-				throw new PT_Exception('Already collecting validation errors'); //TODO: change
+				throw new Exception('Already collecting validation errors'); //TODO: change
 			
 			$this->_collect_validation_errors = TRUE;
 			$this->_validation_errors = array();
@@ -156,12 +163,12 @@
 		public function checkValidation()
 		{
 			if (!$this->_collect_validation_errors)
-				throw new PT_Exception('Not collecting validation errors. Call collectValidationErrors() first'); //TODO: change
+				throw new Exception('Not collecting validation errors. Call collectValidationErrors() first'); //TODO: change
 			
 			$this->_collect_validation_errors = FALSE;
 			
 			if ($this->_validation_errors)
-				throw new PT_Exception_Entity_ValidationGroup($this->_validation_errors);
+				throw new Exception_Entity_ValidationGroup($this->_validation_errors);
 		}
 		
 		/**
@@ -169,18 +176,17 @@
 		 * The array may contain only some of the properties defined in the model.
 		 * @param array $data keyed by property name
 		 * @return NULL
-		 * @throws PT_Exception_Entity_ValidationGroup
 		 */
 		public static function checkValidationGroup($data)
 		{
 			foreach ($data as $key => $value)
-				self::_validate($key, $value, self::getGlobalValidators($key), TRUE, $errors);
+				static::_validate($key, $value, self::getGlobalValidators($key), TRUE, $errors);
 			
 			if ($errors)
-				throw new PT_Exception_Entity_ValidationGroup($errors);
+				throw new Exception_Entity_ValidationGroup($errors);
 		}
 		
-		private static function _validate($name, $value, $validators, $collect_errors, &$errors)
+		protected static function _validate($name, $value, $validators, $collect_errors, &$errors)
 		{
 			if ($collect_errors && !is_array($errors))
 				$errors = array();
@@ -200,7 +206,7 @@
 						$errors[$name] = array_merge($errors[$name], $v->getMessages());
 					}
 					else
-						throw new PT_Exception_Entity_Validation($name, $value, $v->getMessages());
+						throw new Exception('Validation errors: '.print_r(array($name, $value, $v->getMessages()), TRUE));
 				}
 			}
 			
@@ -209,10 +215,10 @@
 		public function __set($name, $value)
 		{
 			if (!array_key_exists($name, $this->_data))
-				throw new PT_Exception_Entity_NewProperty();
+				throw new CModel_Exception_Entity_NewProperty();
 			
 			if (!$this->_ignore_readonly && !$this->_creating && !$this->_saving && in_array($name, $this->_readonly))
-				throw new PT_Exception_Entity_ReadOnly($name);
+				throw new CModel_Exception_Entity_ReadOnly($name);
 			
 			//process filters
 			foreach ($this->getFilters($name) as $filter)
@@ -323,6 +329,18 @@
 		}
 		
 		/**
+		 * Defines a collection.
+		 * @param string $name
+		 * @param string $class_name the class name (for ex. "House", if class "House" extends CModel_Entity, and there is a HouseMapper class too)
+		 * @param string $fk_field the name of the field that acts as a foreign key
+		 * @return Zend_Db_Select
+		 */
+		public function setCollection($name, $class_name, $fk_field = NULL)
+		{
+			return $this->_data[$name] = new CModel_Collection($class_name, $fk_field, $this);
+		}
+		
+		/**
 		 * Set the "changed" flag to TRUE.
 		 * This is not meant to be used regularly; only in very special places.
 		 * @return NULL
@@ -429,13 +447,12 @@
 		/**
 		 * Checks required properties.
 		 * @return NULL
-		 * @throws PT_Exception_Entity_RequiredProperty
 		 */
 		public function validateRequiredProperties()
 		{
 			foreach ($this->_required as $property)
 				if (!$this->$property)
-					throw new PT_Exception_Entity_RequiredProperty($property);
+					throw new Exception('Required: '.$property);
 		}
 		
 		/**
@@ -452,6 +469,11 @@
 				$last_temp_id = self::$session->last_temp_id++;
 			
 			return 'new-'.self::$session->last_temp_id;
+		}
+		
+		public static function getMapperClassName()
+		{
+			return get_called_class().'Mapper';
 		}
 
 	}

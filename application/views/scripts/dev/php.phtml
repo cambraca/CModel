@@ -1,0 +1,35 @@
+<div class="top-bar span-24 last">
+	<ul class="links">
+		<li><a href="/dev">Dev Tools!</a></li>
+	</ul>
+</div>
+
+<h2 class="span-24 last">Run PHP Code</h2>
+
+<div class="span-11">
+	<?= $this->form ?>
+</div>
+
+<div class="span-13 last">
+	<?php if ($this->code): ?>
+		<h3>Result</h3>
+		<code style="display: block; background-color: #e0f0ff; margin: 20px 0; padding: 15px; border: inset 2px #ddd; overflow: auto;">
+			<?php
+				try {
+					eval($this->code);
+				} catch (Exception $e)
+				{
+					Zend_Debug::dump($e, 'Error caught!');
+				};
+			?>
+		</code>
+	<?php endif; ?>
+
+<?php /*
+	<ul>
+	<?php foreach ($this->paginator as $item):
+		?><li><a href="/dev/php/id/<?= $item['id'] ?>"><?= $item['name'] ?></a></li>
+	<?php endforeach; ?>
+	</ul>
+	<?php echo $this->paginator;*/ ?>
+</div>

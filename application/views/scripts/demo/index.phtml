@@ -1,0 +1,13 @@
+<h1>CModel sample project</h1>
+
+<h2>Authors</h2>
+
+<ul>
+	<?php foreach ($this->authors as $author): ?>
+	<li>
+		<a href="/demo/author/id/<?= $author->id ?>">
+			<?= $author->name ?> (<?= count($author->posts) ?> posts)
+		</a>
+	</li>
+	<?php endforeach; ?>
+</ul>
